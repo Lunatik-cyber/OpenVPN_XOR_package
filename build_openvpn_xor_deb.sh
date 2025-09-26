@@ -8,7 +8,7 @@
 set -e  # Exit on any error
 
 # Configuration
-OPENVPN_VERSION="2.6.14"
+OPENVPN_VERSION="2.5.9"
 OPENVPN_URL="https://raw.githubusercontent.com/Tunnelblick/Tunnelblick/master/third_party/sources/openvpn/openvpn-${OPENVPN_VERSION}/openvpn-${OPENVPN_VERSION}.tar.gz"
 BUILD_DIR="/tmp/openvpn_xor_build"
 LOGFILE="/tmp/openvpn_xor_build.log"
