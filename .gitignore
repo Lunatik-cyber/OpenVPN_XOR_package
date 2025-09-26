@@ -1,0 +1,37 @@
+# Temporary files
+/tmp/
+*.tmp
+*.log
+
+# Build artifacts
+*.o
+*.a
+*.so
+*.so.*
+build/
+dist/
+*.egg-info/
+
+# Debian packaging artifacts (when building)
+debian/tmp/
+debian/.debhelper/
+debian/files
+debian/*.substvars
+debian/*.debhelper
+debian/*.log
+
+# Editor and IDE files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.sublime-*
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Test directories
+test_*/
+*_test/
