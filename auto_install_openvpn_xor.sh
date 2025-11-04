@@ -73,10 +73,6 @@ install_dependencies() {
         "git"
         "wget"
         "curl"
-        "build-essential"
-        "devscripts"
-        "debhelper"
-        "dh-make"
     )
     
     # Update package list
