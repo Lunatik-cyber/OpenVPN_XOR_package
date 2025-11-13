@@ -65,46 +65,6 @@ check_system() {
     log_success "System compatibility check passed."
 }
 
-# Function to install dependencies
-install_dependencies() {
-    log "Installing necessary dependencies..."
-    
-    local dependencies=(
-        "git"
-        "wget"
-        "curl"
-    )
-    
-    # Update package list
-    if [[ $EUID -eq 0 ]]; then
-        apt update
-    else
-        sudo apt update
-    fi
-    
-    # Install dependencies
-    for dep in "${dependencies[@]}"; do
-        if ! dpkg -l | grep -q "^ii  $dep "; then
-            log "Installing $dep..."
-            if [[ $EUID -eq 0 ]]; then
-                apt install -y "$dep" || {
-                    log_error "Failed to install $dep"
-                    exit 1
-                }
-            else
-                sudo apt install -y "$dep" || {
-                    log_error "Failed to install $dep"
-                    exit 1
-                }
-            fi
-        else
-            log "$dep is already installed."
-        fi
-    done
-    
-    log_success "All dependencies installed successfully."
-}
-
 # Function to clone repository
 clone_repository() {
     log "Cloning OpenVPN_XOR_package repository..."
@@ -165,29 +125,6 @@ build_or_find_packages() {
         return 0
     fi
     
-    # Check if there's a build script in the repository
-    if [[ -f "build_openvpn_xor_deb.sh" ]]; then
-        log "Found build script. Attempting to build from source..."
-        ./build_openvpn_xor_deb.sh -k || {
-            log_error "Failed to build package using build script"
-            exit 1
-        }
-        
-        # Look for built packages in temporary build directory
-        local build_results="/tmp/openvpn_xor_build/results"
-        if [[ -d "$build_results" ]]; then
-            local built_debs=$(find "$build_results" -name "*.deb" -type f)
-            if [[ -n "$built_debs" ]]; then
-                log "Copying built packages to current directory..."
-                cp "$build_results"/*.deb . 2>/dev/null || true
-                log_success "Packages built and copied successfully."
-                return 0
-            fi
-        fi
-        
-        log_error "Build script completed but no deb packages were found."
-        exit 1
-    fi
     
     # If no packages or build options found
     log_warning "No pre-built packages, debian directory, or build script found."
@@ -245,7 +182,6 @@ install_packages() {
     if [[ $EUID -eq 0 ]]; then
         dpkg -i "$openvpn_deb" || {
             log "Resolving dependencies..."
-            apt install -f -y
             dpkg -i "$openvpn_deb" || {
                 log_error "Failed to install OpenVPN package"
                 exit 1
@@ -254,7 +190,6 @@ install_packages() {
     else
         sudo dpkg -i "$openvpn_deb" || {
             log "Resolving dependencies..."
-            sudo apt install -f -y
             sudo dpkg -i "$openvpn_deb" || {
                 log_error "Failed to install OpenVPN package"
                 exit 1
@@ -342,7 +277,6 @@ main() {
     # Execute installation steps
     check_root
     check_system
-    install_dependencies
     clone_repository
     build_or_find_packages
     install_packages
